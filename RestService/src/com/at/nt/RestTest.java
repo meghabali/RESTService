@@ -47,6 +47,10 @@ public class RestTest {
 				String jsonStr = getOutputString(connection.getInputStream());
 				processOutput(jsonStr);
 			}
+			else
+			{
+				System.out.println("Given URL is not working..");
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
