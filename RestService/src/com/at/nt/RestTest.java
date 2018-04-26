@@ -16,19 +16,26 @@ import com.google.gson.Gson;
  * @author Megha Bali
  * 
  * Assuming the restService will return the JSON in the form of:
- * 		[ { "key" : "value", "key" : "value" }, { "key" : "value" } ]
- * 
- * ex: 	[ { 3 : "doc1", 4.3 : "doc2" }, { 5 : "doc3" } ]
+ * 		[ {"numbers" : [2, 3.0, 5]}, {"numbers" : [6.3, 3, 7]} ]
  * 
  * Output Requirements:
- * 1. For each document display all of the keys of the JSON.
- * 2. Keys are number(int/float etc), Add all numbers.
- * 3. Total of the numbers that were summed
+ * 1. For each document display all the key names.
+ * 2. Find the sum of all numbers of the key "numbers".
+ * 3. Total all of the numbers through out document.
  */
 public class RestTest {
 
-	private static final Gson GSON = new Gson();
+	private final Gson GSON = new Gson();
+	private final String KEY_NUMBERS = "numbers";
 
+	public static void main(String[] args) {
+		if(args[0] != null) {
+			new RestTest(args[0]);	
+		} else {
+			System.err.println("Please provide the Rest Service's URL...");
+		}
+	}
+	
 	public RestTest(String restUrl) {
 		consumeRest(restUrl);
 	}
@@ -51,22 +58,28 @@ public class RestTest {
 	 */
 	private void processOutput(String jsonStr) {
 		List<Map<Object, Object>> docList = GSON.fromJson(jsonStr, List.class);
-		System.out.println("Requirement 1: For each document display all of the keys of the JSON.");
-		for(Map<Object, Object> map : docList) {
-			System.out.println("\tDocument's keys: "+map.keySet());
+		System.out.println("Requirement 1: all the key names.");
+		for (Map<Object, Object> map : docList) {
+			System.out.println("\tKey's names: " + map.keySet());
 		}
-		System.out.println("Requirement 2: Keys are number(int/float etc), Add all numbers.");
+		System.out.println("Requirement 2: Sum of all numbers of the key \"numbers\".");
 		double total = 0;
-		for(Map<Object, Object> map : docList) {
+		for (Map<Object, Object> map : docList) {
 			double sum = 0;
-			for(Object number : map.keySet()) {
-				sum += Double.parseDouble(number+"");
+			List<Number> numbers = null;
+			for (Object key : map.keySet()) {
+				if (KEY_NUMBERS.equals(key)) {
+					numbers = (List<Number>) map.get(key);
+					for (Number number : numbers)
+						if(number != null)
+							sum += number.doubleValue();
+				}
 			}
 			total += sum;
-			System.out.println("\tDocument keys sum: "+ sum);
+			System.out.println("\tAll numbers: " + numbers + ", Sum of numbers: " + sum);
 		}
-		System.out.println("Requirement 3: Total of the numbers that were summed.");
-		System.out.println("\tTotal sum: "+ total);
+		System.out.println("Requirement 3: Total sum of the numbers through out the execution.");
+		System.out.println("\tTotal sum: " + total);
 	}
 
 	/**
